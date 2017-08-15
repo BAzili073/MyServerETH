@@ -48,23 +48,31 @@ func index(w http.ResponseWriter, r *http.Request){
 }
 
 func main() {
-  go webServer();
   go tcpServer();
-
+  go webServer();
   var input string
   fmt.Scanln(&input)
 }
 
+
 func webServer(){
-  for {
-    http.HandleFunc("/", index)
-    http.HandleFunc("/api/v1/values", changeRGB)
-    http.ListenAndServe(":8080", nil)
-  }
+  http.HandleFunc("/", index)
+  http.HandleFunc("/api/v1/values", changeRGB)
+  http.HandleFunc("/api/v1/resetPoint", resetPoint)
+  http.HandleFunc("/api/v1/tBut", tBut)
+  http.ListenAndServe(":8080", nil)
+}
+func resetPoint (w http.ResponseWriter, r *http.Request){
+  log.Printf("ResetPoint");
+  arduino.ResetPoint(*Point_1.Conn);
+}
+
+func tBut (w http.ResponseWriter, r *http.Request){
+  log.Printf("testButton");
+  arduino.DigitalRead(*Point_1.Conn,7);
 }
 
 func changeRGB (w http.ResponseWriter, r *http.Request){
-  fmt.Println("cnhage")
   decoder := json.NewDecoder(r.Body)
     var color rgbResponse
     err := decoder.Decode(&color)
@@ -73,16 +81,16 @@ func changeRGB (w http.ResponseWriter, r *http.Request){
     }
     colorValue, err := strconv.Atoi(color.Value);
     if (color.Id == "Red"){
-      // arduino.DigitalWrite(Point_1.Conn,1,1)
-      fmt.Println("Red = ",colorValue)
+      arduino.AnalogWrite(*Point_1.Conn,5,byte(colorValue));
     }
 }
+var Point_1 Point;
 
 func tcpServer(){
-  Point_1 := Point{
-    Ip : "10.10.2.9",
-    Port : "3333",
-    Id : 9};
+  Point_1.Ip = "10.10.2.9";
+  Point_1.Port =  "3333";
+  Point_1.Id = 9;
+
   p1, err := net.Listen("tcp", ":"+Point_1.Port)
   if err != nil {
       fmt.Println("Error listening:", err.Error())
