@@ -20,6 +20,7 @@ const (
     COMMAND = 1
     ARG_1 = 2
     ARG_2  = 3
+    ARG_3  = 4
 )
 
 type Point struct{
@@ -42,7 +43,7 @@ type rgbResponse struct {
 
 func index(w http.ResponseWriter, r *http.Request){
   w.Header().Set("Content-type","text/html");
-  t, err := template.ParseFiles("./index.html")
+  t, err := template.ParseFiles("index.html")
   if err !=nil {log.Panic(err)}
   t.Execute(w, &page{Title:"Just Page",Msg: "Just Message"});
 }
@@ -60,6 +61,8 @@ func webServer(){
   http.HandleFunc("/api/v1/values", changeRGB)
   http.HandleFunc("/api/v1/resetPoint", resetPoint)
   http.HandleFunc("/api/v1/tBut", tBut)
+  http.HandleFunc("/api/v1/tBut2", tBut2)
+  http.HandleFunc("/api/v1/tBut3", tBut3)
   http.ListenAndServe(":8080", nil)
 }
 func resetPoint (w http.ResponseWriter, r *http.Request){
@@ -69,7 +72,17 @@ func resetPoint (w http.ResponseWriter, r *http.Request){
 
 func tBut (w http.ResponseWriter, r *http.Request){
   log.Printf("testButton");
-  arduino.DigitalRead(*Point_1.Conn,7);
+  arduino.DHTGetHumi(*Point_1.Conn,3);
+}
+func tBut2 (w http.ResponseWriter, r *http.Request){
+  log.Printf("testButton2");
+  arduino.DHTGetTemp(*Point_1.Conn,3);
+}
+func tBut3 (w http.ResponseWriter, r *http.Request){
+  log.Printf("testButton3");
+  arduino.DHTGetTemp(*Point_1.Conn,3);
+  arduino.DHTGetHumi(*Point_1.Conn,3);
+  arduino.AnalogRead(*Point_1.Conn,arduino.A0);
 }
 
 func changeRGB (w http.ResponseWriter, r *http.Request){
@@ -93,21 +106,21 @@ func tcpServer(){
 
   p1, err := net.Listen("tcp", ":"+Point_1.Port)
   if err != nil {
-      fmt.Println("Error listening:", err.Error())
+      log.Println("Error listening:", err.Error())
       os.Exit(1)
   }
   // Close the listener when the application closes.
   defer p1.Close()
-  fmt.Println("Listening on "  + Point_1.Port + " port")
+  log.Println("Listening P_1 on "  + Point_1.Port + " port")
   for {
       // Listen for an incoming connection.
       conn, err := p1.Accept()
       Point_1.Conn = &conn;
       if err != nil {
-          fmt.Println("Error accepting: ", err.Error())
+          log.Println("P_1 -> Error accepting: ", err.Error())
           os.Exit(1)
       }else{
-        fmt.Println("Connection accept")
+        log.Println("P_1 -> Connected")
       }
       // Handle connections in a new goroutine.
       go point1Server(conn)
@@ -122,17 +135,25 @@ func point1Server(conn net.Conn) {
       if err != nil {
         // log.Println("Error reading:", err.Error())
       }else{
-        log.Printf("Len = %d",reqLen);
-        log.Printf("Buff = %d",buf);
+        log.Printf("P_1 -> Incoming data! Len = %d Data = %d",reqLen,buf);
       }
 
       if (buf[COMMAND] == arduino.COMMAND_SETUP){
         arduino.SetupPoint_1(conn);
       }
+      if (buf[COMMAND] == arduino.COMMAND_DHT_GET_TEMP){
+        log.Printf("get temp on pin %d -> %d",buf[ARG_1],((int(buf[ARG_2])>>4) + (int(buf[ARG_3])<<4)));
+      }
+      if (buf[COMMAND] == arduino.COMMAND_DHT_GET_HUMI){
+        log.Printf("get humi on pin %d -> %d",buf[ARG_1],((int(buf[ARG_2])>>4) + (int(buf[ARG_3])<<4)));
+      }
+      if (buf[COMMAND] == arduino.COMMAND_DIGITAL_READ){
+        if (buf[ARG_1] == 2){
+            arduino.DigitalWrite(*Point_1.Conn,6,buf[ARG_2])
+        }
+      }
+      if (buf[COMMAND] == arduino.COMMAND_ANALOG_READ){
+        log.Printf("get value on pin %d -> %d",buf[ARG_1],((int(buf[ARG_2])>>4) + (int(buf[ARG_3])<<4)));
+      }
     }
 }
-
-// func pinMode(conn net.Conn, pin byte, mode byte){
-//   Send_message := ;
-//
-// }

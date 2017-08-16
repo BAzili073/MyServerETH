@@ -8,6 +8,8 @@
  <body>
     <p><input type="button" id = "resetPoint" value="Ресет точки"></p>
     <p><input type="button" id = "testBut" value="тестовая"></p>
+    <p><input type="button" id = "testBut2" value="тестовая2"></p>
+    <p><input type="button" id = "testBut3" value="тестовая3"></p>
    <p>Green <input type="range" min="0" max="255" id="Red" value="10"></p>
     <script type="text/javascript">
       $(function(){
@@ -30,6 +32,16 @@
                url: "/api/v1/tBut",
              })
            });
+           $("#testBut2").on("click", function(e){
+              $.post({
+                url: "/api/v1/tBut2",
+              })
+            });
+            $("#testBut3").on("click", function(e){
+               $.post({
+                 url: "/api/v1/tBut3",
+               })
+             });
       }
     );
     </script>
