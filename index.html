@@ -6,42 +6,99 @@
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
  </head>
  <body>
-    <p><input type="button" id = "resetPoint" value="Ресет точки"></p>
-    <p><input type="button" id = "testBut" value="тестовая"></p>
-    <p><input type="button" id = "testBut2" value="тестовая2"></p>
-    <p><input type="button" id = "testBut3" value="тестовая3"></p>
-   <p>Green <input type="range" min="0" max="255" id="Red" value="10"></p>
-    <script type="text/javascript">
-      $(function(){
-       $("#Red").on("change", function(e){
-         $.post({
-           url: "/api/v1/values",
-           data: JSON.stringify({value: e.target.value,id:e.target.id}),
-           dataType: "json",
-           contentType: 'application/json; charset=utf-8'
-         })
-       })
 
-         $("#resetPoint").on("click", function(e){
-            $.post({
-              url: "/api/v1/resetPoint",
-            })
-          });
-          $("#testBut").on("click", function(e){
-             $.post({
-               url: "/api/v1/tBut",
-             })
-           });
-           $("#testBut2").on("click", function(e){
-              $.post({
-                url: "/api/v1/tBut2",
-              })
-            });
-            $("#testBut3").on("click", function(e){
-               $.post({
-                 url: "/api/v1/tBut3",
-               })
-             });
+    <p><input type="button" id = "P1_resetPoint" value="Ресет точки"></p>
+    <p><input type="button" id = "P1_testBut" value="влажность">   {{index .Data "Humi"}}</p>
+    <p><input type="button" id = "P1_testBut2" value="температура"> {{index .Data "Temp"}}</p>
+    <p><input type="button" id = "P1_testBut3" value="тестовая3"></p>
+    <p>Green <input type="range" min="0" max="255" id="P1_RGB_G" value="100"></p>
+
+     <p>Red <input type="range" min="0" max="255" id="P2_RGB_R" value="100"></p>
+     <p>Green <input type="range" min="0" max="255" id="P2_RGB_G" value="100"></p>
+     <p>Blue <input type="range" min="0" max="255" id="P2_RGB_B" value="100"></p>
+
+   <p><input type="button" id = "P2_resetPoint" value="Сброс точки"></p>
+
+    <script type="text/javascript">
+
+      $(function(){
+
+        $("#P1_resetPoint").on("click", function(e){
+          $.post({
+            url: "/P1",
+            data: JSON.stringify({id: e.target.id, value: e.target.value}),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8'
+          })
+        })
+        $("#P1_testBut").on("click", function(e){
+          $.post({
+            url: "/P1",
+            data: JSON.stringify({id: e.target.id, value: e.target.value}),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8'
+          })
+        })
+        $("#P1_testBut2").on("click", function(e){
+          $.post({
+            url: "/P1",
+            data: JSON.stringify({id: e.target.id, value: e.target.value}),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8'
+          })
+        })
+        $("#P1_testBut3").on("click", function(e){
+          $.post({
+            url: "/P1",
+            data: JSON.stringify({id: e.target.id, value: e.target.value}),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8'
+          })
+        })
+
+        $("#P1_RGB_G").on("change", function(e){
+          $.post({
+            url: "/P1",
+            data: JSON.stringify({id: e.target.id, value: e.target.value}),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8'
+          })
+        })
+
+        $("#P2_RGB_R").on("change", function(e){
+          $.post({
+            url: "/P2",
+            data: JSON.stringify({id: e.target.id, value: e.target.value}),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8'
+          })
+        })
+        $("#P2_RGB_G").on("change", function(e){
+          $.post({
+            url: "/P2",
+            data: JSON.stringify({id: e.target.id, value: e.target.value}),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8'
+          })
+        })
+        $("#P2_RGB_B").on("change", function(e){
+          $.post({
+            url: "/P2",
+            data: JSON.stringify({id: e.target.id, value: e.target.value}),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8'
+          })
+        })
+
+        $("#P2_resetPoint").on("click", function(e){
+          $.post({
+            url: "/P2",
+            data: JSON.stringify({id: e.target.id, value: e.target.value}),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8'
+          })
+        })
+
       }
     );
     </script>

@@ -42,10 +42,19 @@ const(
   A5 = 19
   A6 = 20
   A7 = 21
+
+
+  P2_PIN_RGB_R = 5
+  P2_PIN_RGB_G = 3
+  P2_PIN_RGB_B = 6
 )
 
+func sendMessage(conn net.Conn,command byte,arg_1 byte,arg_2 byte,arg_3 byte){
+    conn.Write([]byte{1,command,arg_1,arg_2,arg_3});
+}
+
 func PinMode(conn net.Conn, pin byte, mode byte){
-  sendMessage(conn,COMMAND_DIGITAL_WRITE,pin,mode,0);
+  sendMessage(conn,COMMAND_PINMODE,pin,mode,0);
 }
 
 func DigitalWrite(conn net.Conn, pin byte, state byte){
@@ -98,6 +107,10 @@ func SetupPoint_1(conn net.Conn){
   sendMessage(conn,COMMAND_SETUP,1,1,0);
 }
 
-func sendMessage(conn net.Conn,command byte,arg_1 byte,arg_2 byte,arg_3 byte){
-    conn.Write([]byte{1,command,arg_1,arg_2,arg_3});
+func SetupPoint_2(conn net.Conn){
+  log.Printf("Setup point 2");
+  PinMode(conn,P2_PIN_RGB_R,PIN_OUTPUT);
+  PinMode(conn,P2_PIN_RGB_G,PIN_OUTPUT);
+  PinMode(conn,P2_PIN_RGB_B,PIN_OUTPUT);
+  sendMessage(conn,COMMAND_SETUP,1,1,0);
 }
