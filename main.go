@@ -3,7 +3,7 @@ package main
 //scp ~/Work/goHomeServer/* pi@192.168.1.50:GoServer
 
 import (
-    "fmt"
+    // "fmt"
     "net/http"
     "net"
     "html/template"
@@ -55,9 +55,15 @@ func index(w http.ResponseWriter, r *http.Request){
 func main() {
   go tcpServer_P1();
   go tcpServer_P2();
-  go webServer();
-  var input string
-  fmt.Scanln(&input)
+  // go webServer();
+  // var input string
+  // fmt.Scanln(&input)
+  for{
+    http.HandleFunc("/", index)
+    http.HandleFunc("/P1", P1_action)
+    http.HandleFunc("/P2", P2_action)
+    http.ListenAndServe(":8080", nil)
+  }
 }
 
 
@@ -73,14 +79,12 @@ func P1_action (w http.ResponseWriter, r *http.Request){
       log.Printf("P1 not connect");
       return
   }
-  log.Printf("P1_action");
   decoder := json.NewDecoder(r.Body)
     var request requestPage
     err := decoder.Decode(&request)
     if err != nil {
       log.Fatal(err)
     }
-    log.Printf("request = ",request);
     if (request.Id == "P1_RGB_G"){
       requestValue, err := strconv.Atoi(request.Value);
       if err != nil {
